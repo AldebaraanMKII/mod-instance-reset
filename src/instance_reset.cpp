@@ -1,6 +1,16 @@
 #include "instance_reset.h"
 
 /*
+* Dedicated npc_text id for this module's hint, kept out of the DB.
+* DEFAULT_GOSSIP_MESSAGE (0xFFFFFF) must NOT be used here: it is the shared
+* fallback text ("Greetings, $n.") returned for every NPC whose gossip menu
+* has no applicable text row. Injecting our text under that id overwrites the
+* client-side cache and makes unrelated NPCs (e.g. Katrana Prestor) show the
+* instance reset message. Use a custom id that collides with nothing.
+*/
+static constexpr uint32 INSTANCE_RESET_GOSSIP_TEXT = 500000;
+
+/*
 * This method is used to override the npc_text
 * Without resorting to the database, since it is a module.
 * And we want to avoid adding information that is not blizzlike.
@@ -140,8 +150,8 @@ bool InstanceReset::OnGossipHello(Player* player, Creature* creature)
         }
     }
 
-    GossipSetText(player, message, DEFAULT_GOSSIP_MESSAGE);
-    SendGossipMenuFor(player, DEFAULT_GOSSIP_MESSAGE, creature->GetGUID());
+    GossipSetText(player, message, INSTANCE_RESET_GOSSIP_TEXT);
+    SendGossipMenuFor(player, INSTANCE_RESET_GOSSIP_TEXT, creature->GetGUID());
     return true;
 }
 
